@@ -1,11 +1,11 @@
-package com.povush.quests.di
+package com.povush.chat.di
 
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation3.runtime.entry
 import com.povush.navigation.di.EntryProviderInstaller
 import com.povush.navigation.route.ChatScreenRoute
-import com.povush.quests.ui.ChatScreen
-import com.povush.quests.ui.ChatViewModel
+import com.povush.chat.ui.ChatScreen
+import com.povush.chat.ui.ChatViewModel
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

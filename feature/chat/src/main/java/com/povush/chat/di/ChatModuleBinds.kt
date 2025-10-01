@@ -1,7 +1,7 @@
-package com.povush.quests.di
+package com.povush.chat.di
 
-import com.povush.quests.repository.ChatRepository
-import com.povush.quests.repository.impl.ChatRepositoryImpl
+import com.povush.chat.repository.ChatRepository
+import com.povush.chat.repository.impl.ChatRepositoryImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

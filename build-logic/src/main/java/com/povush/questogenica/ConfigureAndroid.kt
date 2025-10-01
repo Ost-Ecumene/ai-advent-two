@@ -38,5 +38,9 @@ internal fun Project.configureAndroid(
                 jvmTarget = JvmTarget.fromTarget(JvmTarget.JVM_11.target)
             }
         }
+
+        buildFeatures {
+            buildConfig = true
+        }
     }
 }

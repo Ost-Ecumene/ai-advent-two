@@ -16,6 +16,7 @@ internal class ApplicationConventionPlugin : Plugin<Project> {
             apply(plugin = "org.jetbrains.kotlin.android")
             apply(plugin = "com.google.gms.google-services")
             apply(plugin = "org.jetbrains.kotlin.plugin.serialization")
+            apply(plugin = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
             apply(plugin = "questogenica.compose")
             apply(plugin = "questogenica.firestore")
             apply(plugin = "questogenica.hilt")

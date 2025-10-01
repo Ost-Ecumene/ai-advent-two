@@ -17,6 +17,7 @@ internal class ModuleConventionPlugin : Plugin<Project> {
             apply(plugin = "com.android.library")
             apply(plugin = "org.jetbrains.kotlin.android")
             apply(plugin = "org.jetbrains.kotlin.plugin.serialization")
+            apply(plugin = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
             apply(plugin = "questogenica.compose")
 
             extensions.configure<LibraryExtension> {
