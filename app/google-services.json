@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "793374625105",
+    "project_id": "ai-advent-2",
+    "storage_bucket": "ai-advent-2.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:793374625105:android:43e017cc0ca071c5e09770",
+        "android_client_info": {
+          "package_name": "com.povush.aiadvent2"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDWNWnbTe2pCz0cvY7XxAAuAYE6A15IeQ4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
