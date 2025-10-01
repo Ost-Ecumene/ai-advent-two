@@ -15,41 +15,41 @@ public fun AiAdventTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
-    val currentTheme = AppThemes[0]
-
-    val colorScheme = when {
-        darkTheme -> {
-            with(currentTheme.darkTheme) {
-                darkColorScheme(
-                    primary = primary,
-                    onPrimary = onPrimary,
-                    surface = surface,
-                    onSurface = onSurface,
-                    background = CommonLight.background,
-                    onBackground = CommonLight.onBackground,
-                    error = CommonLight.error,
-                    outline = CommonLight.outline
-                )
-            }
-        }
-        else -> {
-            with(currentTheme.lightTheme) {
-                lightColorScheme(
-                    primary = primary,
-                    onPrimary = onPrimary,
-                    surface = surface,
-                    onSurface = onSurface,
-                    background = CommonDark.background,
-                    onBackground = CommonDark.onBackground,
-                    error = CommonDark.error,
-                    outline = CommonDark.outline
-                )
-            }
-        }
-    }
+//    val currentTheme = AppThemes[0]
+//
+//    val colorScheme = when {
+//        darkTheme -> {
+//            with(currentTheme.darkTheme) {
+//                darkColorScheme(
+//                    primary = primary,
+//                    onPrimary = onPrimary,
+//                    surface = surface,
+//                    onSurface = onSurface,
+//                    background = CommonLight.background,
+//                    onBackground = CommonLight.onBackground,
+//                    error = CommonLight.error,
+//                    outline = CommonLight.outline
+//                )
+//            }
+//        }
+//        else -> {
+//            with(currentTheme.lightTheme) {
+//                lightColorScheme(
+//                    primary = primary,
+//                    onPrimary = onPrimary,
+//                    surface = surface,
+//                    onSurface = onSurface,
+//                    background = CommonDark.background,
+//                    onBackground = CommonDark.onBackground,
+//                    error = CommonDark.error,
+//                    outline = CommonDark.outline
+//                )
+//            }
+//        }
+//    }
 
     MaterialTheme(
-        colorScheme = colorScheme,
+        colorScheme = if (darkTheme) darkColorScheme() else lightColorScheme(),
         typography = Typography,
         content = content
     )

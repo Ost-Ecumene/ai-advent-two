@@ -38,7 +38,8 @@ internal fun ChatScreen(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Text(
-                    text = "Welcome to Questogenica!"
+                    text = "Welcome to Questogenica!",
+                    color = MaterialTheme.colorScheme.onBackground
                 )
             }
         }
