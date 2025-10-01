@@ -36,6 +36,7 @@ import com.povush.chat.ChatConfig
 import com.povush.chat.ui.components.MessagesList
 import com.povush.navigation.navigator.Navigator
 import com.povush.navigation.navigator.impl.MockNavigatorImpl
+import com.povush.ui.components.UiTextField
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -83,24 +84,13 @@ internal fun ChatScreen(
                         .padding(horizontal = 12.dp, vertical = 8.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    OutlinedTextField(
-                        modifier = Modifier
-                            .weight(1f),
-                        value = input,
-                        onValueChange = viewModel::onInputChange,
-                        placeholder = { Text("Тапай буковки…") },
-                        singleLine = false,
-                        maxLines = 4,
-                        shape = RoundedCornerShape(12.dp)
+                    UiTextField(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = input,
+                        placeholderText = "Спроси меня!",
+                        onTextChange = viewModel::onInputChange,
+                        onClickSend = viewModel::send
                     )
-                    Spacer(Modifier.width(8.dp))
-                    FilledIconButton(
-                        onClick = { viewModel.send() },
-                        enabled = !isStreaming && input.isNotBlank(),
-                        shape = RoundedCornerShape(6.dp)
-                    ) {
-                        Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Send")
-                    }
                 }
             }
         }
@@ -120,6 +110,7 @@ internal fun ChatScreen(
             }
             MessagesList(
                 messages = chatHistory,
+                isStreaming = isStreaming,
                 modifier = Modifier.weight(1f)
             )
         }
