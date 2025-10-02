@@ -1,5 +1,6 @@
 package com.povush.chat.service
 
+import com.povush.chat.ChatConfig
 import com.povush.chat.network.dto.ChatMessageDto
 import com.povush.chat.network.dto.ChatRequestDto
 import com.povush.chat.network.dto.QuestDto
@@ -11,7 +12,7 @@ class QuestGeneratorLLMService @Inject constructor(
     private val openRouterService: OpenRouterService,
     private val questAdapter: JsonAdapter<QuestDto>
 ) {
-    private val basicSystemPrompt = listOf(ChatMessageDto("system", ""))
+    private val basicSystemPrompt = listOf(ChatMessageDto("system", ChatConfig.simpleSystemPrompt))
 
     suspend fun createQuest(description: String): QuestDto {
         val descriptionSystemPrompt = listOf(ChatMessageDto("system", description))

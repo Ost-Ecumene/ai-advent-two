@@ -18,7 +18,7 @@ internal class ChatRepositoryImpl @Inject constructor(
     private val openRouterService: OpenRouterService,
     private val questGeneratorLLMService: QuestGeneratorLLMService
 ) : ChatRepository() {
-    private val chatSystemPrompt = listOf(ChatMessageDto("system", ""))
+    private val chatSystemPrompt = listOf(ChatMessageDto("system", ChatConfig.simpleSystemPrompt))
     private val basicHistory = listOf<ChatItem>(
 //        ChatItem.Message(
 //            text = ChatConfig.FIRST_MESSAGE,
