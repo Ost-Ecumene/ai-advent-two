@@ -75,6 +75,7 @@ fun MessagesList(
                     ) {
                         QuestCard(
                             quest = item.quest,
+                            questJson = item.questJson,
                             modifier = Modifier.widthIn(max = 520.dp)
                         )
                     }

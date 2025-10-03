@@ -9,7 +9,8 @@ sealed class ChatItem {
     ) : ChatItem()
 
     data class Quest(
-        val quest: QuestDto
+        val quest: QuestDto,
+        val questJson: String
     ) : ChatItem()
 
     data class Log(
