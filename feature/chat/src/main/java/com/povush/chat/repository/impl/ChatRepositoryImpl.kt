@@ -6,7 +6,6 @@ import com.povush.chat.model.Role
 import com.povush.chat.network.OpenRouterService
 import com.povush.chat.network.dto.ChatMessageDto
 import com.povush.chat.network.dto.ChatRequestDto
-import com.povush.chat.network.dto.toText
 import com.povush.chat.repository.ChatRepository
 import com.povush.chat.service.QuestGeneratorLLMService
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,7 +17,8 @@ internal class ChatRepositoryImpl @Inject constructor(
     private val openRouterService: OpenRouterService,
     private val questGeneratorLLMService: QuestGeneratorLLMService
 ) : ChatRepository() {
-    private val chatSystemPrompt = listOf(ChatMessageDto("system", ChatConfig.simpleSystemPrompt))
+    private val chatSystemPrompt = listOf(ChatMessageDto("system", ChatConfig.companionSystemPrompt))
+    private var isSessionCompleted = false
     private val basicHistory = listOf<ChatItem>(
 //        ChatItem.Message(
 //            text = ChatConfig.FIRST_MESSAGE,
@@ -30,6 +30,22 @@ internal class ChatRepositoryImpl @Inject constructor(
     override val chatHistory = _chatHistory.asStateFlow()
 
     override suspend fun sendRequest(message: String) {
+        if (isSessionCompleted) {
+            _chatHistory.update {
+                it + listOf(
+                    ChatItem.Message(
+                        text = message,
+                        role = Role.User
+                    ),
+                    ChatItem.Message(
+                        text = "Диалог завершён. Запустите новую сессию, чтобы получить ещё один квест.",
+                        role = Role.Assistant
+                    )
+                )
+            }
+            return
+        }
+
         _chatHistory.update {
             it + ChatItem.Message(
                 text = message,
@@ -45,7 +61,7 @@ internal class ChatRepositoryImpl @Inject constructor(
                 )
                 is ChatItem.Quest -> ChatMessageDto(
                     role = Role.User.internalName,
-                    content = chatItem.quest.toText()
+                    content = chatItem.json
                 )
                 is ChatItem.Log -> ChatMessageDto(
                     role = chatItem.role.internalName,
@@ -60,17 +76,28 @@ internal class ChatRepositoryImpl @Inject constructor(
 
         val answer = if (responseContent.startsWith("Инициировать создание квеста!")) {
             val description = responseContent.removePrefix("Инициировать создание квеста!")
-            val log = ChatItem.Log(
-                text = description,
-                role = Role.Assistant
+            val questResult = questGeneratorLLMService.createQuest(description)
+            isSessionCompleted = true
+            listOf(
+                ChatItem.Log(
+                    text = description,
+                    role = Role.Assistant
+                ),
+                ChatItem.Message(
+                    text = questResult.json,
+                    role = Role.Assistant
+                ),
+                ChatItem.Quest(
+                    quest = questResult.quest,
+                    json = questResult.json
+                )
             )
-            _chatHistory.update { it + log }
-            val quest = questGeneratorLLMService.createQuest(description)
-            ChatItem.Quest(quest = quest)
         } else {
-            ChatItem.Message(
-                text = responseContent,
-                role = Role.Assistant
+            listOf(
+                ChatItem.Message(
+                    text = responseContent,
+                    role = Role.Assistant
+                )
             )
         }
 
