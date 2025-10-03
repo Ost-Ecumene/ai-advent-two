@@ -18,12 +18,12 @@ internal class ChatRepositoryImpl @Inject constructor(
     private val openRouterService: OpenRouterService,
     private val questGeneratorLLMService: QuestGeneratorLLMService
 ) : ChatRepository() {
-    private val chatSystemPrompt = listOf(ChatMessageDto("system", ChatConfig.simpleSystemPrompt))
-    private val basicHistory = listOf<ChatItem>(
-//        ChatItem.Message(
-//            text = ChatConfig.FIRST_MESSAGE,
-//            role = Role.Assistant
-//        )
+    private val chatSystemPrompt = listOf(ChatMessageDto("system", ChatConfig.companionSystemPrompt))
+    private val basicHistory = listOf(
+        ChatItem.Message(
+            text = ChatConfig.FIRST_MESSAGE,
+            role = Role.Assistant
+        )
     )
 
     private val _chatHistory = MutableStateFlow<List<ChatItem>>(basicHistory)

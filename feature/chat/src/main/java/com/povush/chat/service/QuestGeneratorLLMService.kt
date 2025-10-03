@@ -12,7 +12,7 @@ class QuestGeneratorLLMService @Inject constructor(
     private val openRouterService: OpenRouterService,
     private val questAdapter: JsonAdapter<QuestDto>
 ) {
-    private val basicSystemPrompt = listOf(ChatMessageDto("system", ChatConfig.simpleSystemPrompt))
+    private val basicSystemPrompt = listOf(ChatMessageDto("system", ChatConfig.questGeneratorSystemPrompt))
 
     suspend fun createQuest(description: String): QuestDto {
         val descriptionSystemPrompt = listOf(ChatMessageDto("system", description))
