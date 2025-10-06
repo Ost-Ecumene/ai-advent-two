@@ -6,5 +6,5 @@ import kotlinx.coroutines.flow.StateFlow
 
 internal abstract class ChatRepository : BaseRepository() {
     abstract val chatHistory: StateFlow<List<ChatItem>>
-    abstract suspend fun sendRequest(message: String)
+    abstract suspend fun sendRequest(message: String, temperature: Double)
 }

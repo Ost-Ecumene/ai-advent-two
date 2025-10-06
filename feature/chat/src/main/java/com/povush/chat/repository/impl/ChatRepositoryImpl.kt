@@ -18,7 +18,7 @@ internal class ChatRepositoryImpl @Inject constructor(
     private val openRouterService: OpenRouterService,
     private val questGeneratorLLMService: QuestGeneratorLLMService
 ) : ChatRepository() {
-    private val chatSystemPrompt = listOf(ChatMessageDto("system", ChatConfig.companionSystemPrompt))
+    private val chatSystemPrompt = listOf(ChatMessageDto("system", ""))
     private val basicHistory = listOf(
         ChatItem.Message(
             text = ChatConfig.FIRST_MESSAGE,
@@ -29,7 +29,7 @@ internal class ChatRepositoryImpl @Inject constructor(
     private val _chatHistory = MutableStateFlow<List<ChatItem>>(basicHistory)
     override val chatHistory = _chatHistory.asStateFlow()
 
-    override suspend fun sendRequest(message: String) {
+    override suspend fun sendRequest(message: String, temperature: Double) {
         _chatHistory.update {
             it + ChatItem.Message(
                 text = message,
@@ -54,7 +54,7 @@ internal class ChatRepositoryImpl @Inject constructor(
             }
         }
 
-        val request = ChatRequestDto(messages = messages)
+        val request = ChatRequestDto(messages = messages, temperature = temperature)
         val response = openRouterService.chatCompletion(request)
         val responseContent = response.choices.firstOrNull()?.message?.content ?: throw NullPointerException("Ответ от ИИ не должен быть null!")
 
@@ -65,7 +65,7 @@ internal class ChatRepositoryImpl @Inject constructor(
                 role = Role.Assistant
             )
             _chatHistory.update { it + log }
-            val quest = questGeneratorLLMService.createQuest(description)
+            val quest = questGeneratorLLMService.createQuest(description, temperature)
             ChatItem.Quest(quest = quest)
         } else {
             ChatItem.Message(

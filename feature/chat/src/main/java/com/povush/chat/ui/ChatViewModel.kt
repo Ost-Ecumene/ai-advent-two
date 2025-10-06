@@ -5,6 +5,7 @@ import com.povush.common.base.BaseViewModel
 import com.povush.navigation.di.AssistedVmFactory
 import com.povush.navigation.route.ChatScreenRoute
 import com.povush.chat.repository.ChatRepository
+import com.povush.chat.ChatConfig
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -22,9 +23,14 @@ internal class ChatViewModel @AssistedInject constructor(
     val input = MutableStateFlow("")
     val error = MutableStateFlow<String?>(null)
     val isStreaming = MutableStateFlow(false)
+    val temperature = MutableStateFlow(ChatConfig.BASE_TEMPERATURE)
 
     fun onInputChange(value: String) {
         input.value = value
+    }
+
+    fun onTemperatureChange(value: Float) {
+        temperature.value = value.toDouble()
     }
 
     fun send() {
@@ -36,7 +42,7 @@ internal class ChatViewModel @AssistedInject constructor(
         viewModelScope.launch {
             isStreaming.value = true
             try {
-                chatRepository.sendRequest(userInput)
+                chatRepository.sendRequest(userInput, temperature.value)
             } catch (t: Throwable) {
                 error.value = t.message ?: "Error"
             } finally {

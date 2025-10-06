@@ -3,9 +3,10 @@ package com.povush.chat
 object ChatConfig {
     object Models {
         const val GPT_5_NANO = "openai/gpt-5-nano"
+        const val DEEPSEEK_V_3_1 = "deepseek/deepseek-chat-v3.1"
     }
 
-    const val CURRENT_MODEL = Models.GPT_5_NANO
+    const val CURRENT_MODEL = Models.DEEPSEEK_V_3_1
     const val OPEN_ROUTER_BASE_URL = "https://openrouter.ai/api/v1/"
     const val BASE_TEMPERATURE = 0.8
     const val FIRST_MESSAGE = "Я - Квестогенное Ядро версии 0.1. Чем я могу помочь? :)"

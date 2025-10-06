@@ -12,12 +12,12 @@ class QuestGeneratorLLMService @Inject constructor(
     private val openRouterService: OpenRouterService,
     private val questAdapter: JsonAdapter<QuestDto>
 ) {
-    private val basicSystemPrompt = listOf(ChatMessageDto("system", ChatConfig.questGeneratorSystemPrompt))
+    private val basicSystemPrompt = listOf(ChatMessageDto("system", ""))
 
-    suspend fun createQuest(description: String): QuestDto {
+    suspend fun createQuest(description: String, temperature: Double): QuestDto {
         val descriptionSystemPrompt = listOf(ChatMessageDto("system", description))
         val finalPrompt = basicSystemPrompt + descriptionSystemPrompt
-        val request = ChatRequestDto(messages = finalPrompt)
+        val request = ChatRequestDto(messages = finalPrompt, temperature = temperature)
 
         val response = openRouterService.chatCompletion(request)
         val responseContent = response.choices.firstOrNull()?.message?.content ?: throw NullPointerException("Ответ от ИИ не должен быть null!")

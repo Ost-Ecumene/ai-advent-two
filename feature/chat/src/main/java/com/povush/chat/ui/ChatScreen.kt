@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
@@ -23,6 +24,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -37,6 +39,7 @@ import com.povush.chat.ui.components.MessagesList
 import com.povush.navigation.navigator.Navigator
 import com.povush.navigation.navigator.impl.MockNavigatorImpl
 import com.povush.ui.components.UiTextField
+import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -49,23 +52,26 @@ internal fun ChatScreen(
     val isStreaming by viewModel.isStreaming.collectAsState()
     val error by viewModel.error.collectAsState()
     val chatHistory by viewModel.chatHistory.collectAsState()
+    val temperature by viewModel.temperature.collectAsState()
 
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
                         Text("AI Advent Chat")
                         Text(
                             ChatConfig.CURRENT_MODEL,
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
+                        
                         HorizontalDivider(
                             modifier = Modifier
-                                .padding(
-                                    top = 8.dp
-                                )
+                                .padding(top = 4.dp)
                                 .fillMaxWidth(),
                         )
                     }
@@ -76,21 +82,52 @@ internal fun ChatScreen(
             Surface(
                 tonalElevation = 3.dp
             ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .imePadding()
-                        .navigationBarsPadding()
-                        .padding(horizontal = 12.dp, vertical = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    UiTextField(
-                        modifier = Modifier.fillMaxWidth(),
-                        text = input,
-                        placeholderText = "Спроси меня!",
-                        onTextChange = viewModel::onInputChange,
-                        onClickSend = viewModel::send
-                    )
+                Column {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(100.dp)
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Text(
+                            "Температура:",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Slider(
+                            value = temperature.toFloat(),
+                            onValueChange = { viewModel.onTemperatureChange(it) },
+                            valueRange = 0f..2f,
+                            steps = 19,
+                            modifier = Modifier.weight(1f),
+                            enabled = !isStreaming
+                        )
+                        Text(
+                            String.format("%.1f", temperature),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.width(32.dp)
+                        )
+                    }
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .imePadding()
+                            .navigationBarsPadding()
+                            .padding(horizontal = 12.dp, vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        UiTextField(
+                            modifier = Modifier.fillMaxWidth(),
+                            text = input,
+                            placeholderText = "Спроси меня!",
+                            onTextChange = viewModel::onInputChange,
+                            onClickSend = viewModel::send
+                        )
+                    }
                 }
             }
         }
