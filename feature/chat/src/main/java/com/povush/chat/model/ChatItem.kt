@@ -5,7 +5,8 @@ import com.povush.chat.network.dto.QuestDto
 sealed class ChatItem {
     data class Message(
         val text: String,
-        val role: Role
+        val role: Role,
+        val metrics: MessageMetrics? = null
     ) : ChatItem()
 
     data class Quest(

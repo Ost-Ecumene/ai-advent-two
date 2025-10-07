@@ -1,6 +1,8 @@
 package com.povush.chat.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,6 +21,7 @@ import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledIconButton
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -32,6 +35,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.povush.chat.ChatConfig
@@ -53,6 +57,7 @@ internal fun ChatScreen(
     val error by viewModel.error.collectAsState()
     val chatHistory by viewModel.chatHistory.collectAsState()
     val temperature by viewModel.temperature.collectAsState()
+    val selectedModel by viewModel.selectedModel.collectAsState()
 
     Scaffold(
         topBar = {
@@ -64,7 +69,7 @@ internal fun ChatScreen(
                     ) {
                         Text("AI Advent Chat")
                         Text(
-                            ChatConfig.CURRENT_MODEL,
+                            getModelDisplayName(selectedModel),
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -83,10 +88,45 @@ internal fun ChatScreen(
                 tonalElevation = 3.dp
             ) {
                 Column {
+                    // Выбор модели
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(100.dp)
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        ModelChip(
+                            label = "Бюджет",
+                            model = ChatConfig.Models.BUDGET,
+                            selected = selectedModel == ChatConfig.Models.BUDGET,
+                            onClick = { viewModel.onModelChange(ChatConfig.Models.BUDGET) },
+                            enabled = !isStreaming,
+                            modifier = Modifier.weight(1f)
+                        )
+                        ModelChip(
+                            label = "Средняя",
+                            model = ChatConfig.Models.MEDIUM,
+                            selected = selectedModel == ChatConfig.Models.MEDIUM,
+                            onClick = { viewModel.onModelChange(ChatConfig.Models.MEDIUM) },
+                            enabled = !isStreaming,
+                            modifier = Modifier.weight(1f)
+                        )
+                        ModelChip(
+                            label = "Продвинутая",
+                            model = ChatConfig.Models.ADVANCED,
+                            selected = selectedModel == ChatConfig.Models.ADVANCED,
+                            onClick = { viewModel.onModelChange(ChatConfig.Models.ADVANCED) },
+                            enabled = !isStreaming,
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                    
+                    HorizontalDivider()
+                    
+                    // Температура
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
                             .padding(horizontal = 16.dp, vertical = 8.dp),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -151,6 +191,63 @@ internal fun ChatScreen(
                 modifier = Modifier.weight(1f)
             )
         }
+    }
+}
+
+@Composable
+private fun ModelChip(
+    label: String,
+    model: String,
+    selected: Boolean,
+    onClick: () -> Unit,
+    enabled: Boolean,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier
+            .clip(RoundedCornerShape(8.dp))
+            .background(
+                if (selected) MaterialTheme.colorScheme.primaryContainer
+                else MaterialTheme.colorScheme.surfaceVariant
+            )
+            .border(
+                width = if (selected) 2.dp else 0.dp,
+                color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
+                shape = RoundedCornerShape(8.dp)
+            )
+            .clickable(enabled = enabled) { onClick() }
+            .padding(vertical = 12.dp, horizontal = 8.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(2.dp)
+        ) {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelMedium,
+                color = if (selected) MaterialTheme.colorScheme.onPrimaryContainer
+                else MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            val pricing = ChatConfig.ModelPricing.pricing[model]
+            if (pricing != null && pricing.first == 0.0 && pricing.second == 0.0) {
+                Text(
+                    text = "Бесплатно",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = if (selected) MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
+                    else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                )
+            }
+        }
+    }
+}
+
+private fun getModelDisplayName(model: String): String {
+    return when (model) {
+        ChatConfig.Models.BUDGET -> "Llama 3.2 3B (Free)"
+        ChatConfig.Models.MEDIUM -> "GPT-4o Mini"
+        ChatConfig.Models.ADVANCED -> "Claude 3.5 Sonnet"
+        else -> model
     }
 }
 

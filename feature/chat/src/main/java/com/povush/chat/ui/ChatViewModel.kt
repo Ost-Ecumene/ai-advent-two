@@ -24,6 +24,7 @@ internal class ChatViewModel @AssistedInject constructor(
     val error = MutableStateFlow<String?>(null)
     val isStreaming = MutableStateFlow(false)
     val temperature = MutableStateFlow(ChatConfig.BASE_TEMPERATURE)
+    val selectedModel = MutableStateFlow(ChatConfig.Models.BUDGET)
 
     fun onInputChange(value: String) {
         input.value = value
@@ -31,6 +32,10 @@ internal class ChatViewModel @AssistedInject constructor(
 
     fun onTemperatureChange(value: Float) {
         temperature.value = value.toDouble()
+    }
+    
+    fun onModelChange(model: String) {
+        selectedModel.value = model
     }
 
     fun send() {
@@ -42,7 +47,7 @@ internal class ChatViewModel @AssistedInject constructor(
         viewModelScope.launch {
             isStreaming.value = true
             try {
-                chatRepository.sendRequest(userInput, temperature.value)
+                chatRepository.sendRequest(userInput, temperature.value, selectedModel.value)
             } catch (t: Throwable) {
                 error.value = t.message ?: "Error"
             } finally {

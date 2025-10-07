@@ -82,27 +82,74 @@ fun MessagesList(
                 is ChatItem.Message -> {
                     val isUser = item.role == Role.User
 
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = if (isUser) Arrangement.End else Arrangement.Start
+                    Column(
+                        modifier = Modifier.fillMaxWidth()
                     ) {
-                        Surface(
-                            color = if (isUser) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceContainer,
-                            tonalElevation = 1.dp,
-                            shape = MaterialTheme.shapes.medium
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = if (isUser) Arrangement.End else Arrangement.Start
                         ) {
-                            Column(
-                                Modifier
-                                    .widthIn(max = 520.dp)
-                                    .padding(12.dp)
+                            Surface(
+                                color = if (isUser) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceContainer,
+                                tonalElevation = 1.dp,
+                                shape = MaterialTheme.shapes.medium
                             ) {
-                                Text(
-                                    text = if (isUser) "Ты" else "ПовБот \uD83E\uDD16 (Собеседник)",
-                                    style = MaterialTheme.typography.labelSmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                                Spacer(Modifier.height(4.dp))
-                                Text(item.text, style = MaterialTheme.typography.bodyMedium)
+                                Column(
+                                    Modifier
+                                        .widthIn(max = 520.dp)
+                                        .padding(12.dp)
+                                ) {
+                                    Text(
+                                        text = if (isUser) "Ты" else "ПовБот \uD83E\uDD16 (Собеседник)",
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                    Spacer(Modifier.height(4.dp))
+                                    Text(item.text, style = MaterialTheme.typography.bodyMedium)
+                                }
+                            }
+                        }
+                        
+                        // Показываем метрики для сообщений ассистента
+                        if (!isUser && item.metrics != null) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(start = 8.dp, top = 4.dp),
+                                horizontalArrangement = Arrangement.Start
+                            ) {
+                                Surface(
+                                    color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f),
+                                    shape = MaterialTheme.shapes.small
+                                ) {
+                                    Column(
+                                        modifier = Modifier
+                                            .widthIn(max = 520.dp)
+                                            .padding(8.dp),
+                                        verticalArrangement = Arrangement.spacedBy(2.dp)
+                                    ) {
+                                        Text(
+                                            text = "📊 Метрики",
+                                            style = MaterialTheme.typography.labelSmall,
+                                            color = MaterialTheme.colorScheme.onSecondaryContainer
+                                        )
+                                        Text(
+                                            text = "⏱️ Время: ${item.metrics.formatTime()}",
+                                            style = MaterialTheme.typography.labelSmall,
+                                            color = MaterialTheme.colorScheme.onSecondaryContainer
+                                        )
+                                        Text(
+                                            text = "🎫 ${item.metrics.formatTokens()}",
+                                            style = MaterialTheme.typography.labelSmall,
+                                            color = MaterialTheme.colorScheme.onSecondaryContainer
+                                        )
+                                        Text(
+                                            text = "💰 Стоимость: ${item.metrics.formatCost()}",
+                                            style = MaterialTheme.typography.labelSmall,
+                                            color = MaterialTheme.colorScheme.onSecondaryContainer
+                                        )
+                                    }
+                                }
                             }
                         }
                     }

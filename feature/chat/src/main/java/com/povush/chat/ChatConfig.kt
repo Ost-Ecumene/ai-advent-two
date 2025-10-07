@@ -4,9 +4,28 @@ object ChatConfig {
     object Models {
         const val GPT_5_NANO = "openai/gpt-5-nano"
         const val DEEPSEEK_V_3_1 = "deepseek/deepseek-chat-v3.1"
+        
+        // Модели для сравнения (начало, середина, конец списка HuggingFace)
+        const val BUDGET = "meta-llama/llama-3.2-3b-instruct:free"  // Бесплатная бюджетная модель
+        const val MEDIUM = "openai/gpt-4o-mini"                      // Средняя по цене и качеству
+        const val ADVANCED = "anthropic/claude-3.5-sonnet"           // Продвинутая модель
+    }
+    
+    // Стоимость моделей ($ за 1M токенов)
+    object ModelPricing {
+        val pricing = mapOf(
+            Models.BUDGET to Pair(0.0, 0.0),              // prompt, completion - бесплатно
+            Models.MEDIUM to Pair(0.15, 0.60),            // GPT-4o Mini
+            Models.ADVANCED to Pair(3.0, 15.0)            // Claude 3.5 Sonnet
+        )
+        
+        fun getCost(model: String, promptTokens: Int, completionTokens: Int): Double {
+            val (promptPrice, completionPrice) = pricing[model] ?: Pair(0.0, 0.0)
+            return (promptTokens * promptPrice + completionTokens * completionPrice) / 1_000_000.0
+        }
     }
 
-    const val CURRENT_MODEL = Models.DEEPSEEK_V_3_1
+    const val CURRENT_MODEL = Models.BUDGET  // По умолчанию бюджетная
     const val OPEN_ROUTER_BASE_URL = "https://openrouter.ai/api/v1/"
     const val BASE_TEMPERATURE = 0.8
     const val FIRST_MESSAGE = "Я - Квестогенное Ядро версии 0.1. Чем я могу помочь? :)"

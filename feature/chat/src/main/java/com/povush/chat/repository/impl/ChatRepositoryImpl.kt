@@ -29,7 +29,7 @@ internal class ChatRepositoryImpl @Inject constructor(
     private val _chatHistory = MutableStateFlow<List<ChatItem>>(basicHistory)
     override val chatHistory = _chatHistory.asStateFlow()
 
-    override suspend fun sendRequest(message: String, temperature: Double) {
+    override suspend fun sendRequest(message: String, temperature: Double, model: String) {
         _chatHistory.update {
             it + ChatItem.Message(
                 text = message,
@@ -54,9 +54,29 @@ internal class ChatRepositoryImpl @Inject constructor(
             }
         }
 
-        val request = ChatRequestDto(messages = messages, temperature = temperature)
+        val request = ChatRequestDto(messages = messages, model = model, temperature = temperature)
+        
+        // Замеряем время выполнения запроса
+        val startTime = System.currentTimeMillis()
         val response = openRouterService.chatCompletion(request)
+        val responseTime = System.currentTimeMillis() - startTime
+        
         val responseContent = response.choices.firstOrNull()?.message?.content ?: throw NullPointerException("Ответ от ИИ не должен быть null!")
+        
+        // Рассчитываем метрики
+        val usage = response.usage
+        val metrics = if (usage != null) {
+            com.povush.chat.model.MessageMetrics(
+                model = model,
+                responseTimeMs = responseTime,
+                promptTokens = usage.promptTokens,
+                completionTokens = usage.completionTokens,
+                totalTokens = usage.totalTokens,
+                cost = ChatConfig.ModelPricing.getCost(model, usage.promptTokens, usage.completionTokens)
+            )
+        } else {
+            null
+        }
 
         val answer = if (responseContent.startsWith("Инициировать создание квеста!")) {
             val description = responseContent.removePrefix("Инициировать создание квеста!")
@@ -70,7 +90,8 @@ internal class ChatRepositoryImpl @Inject constructor(
         } else {
             ChatItem.Message(
                 text = responseContent,
-                role = Role.Assistant
+                role = Role.Assistant,
+                metrics = metrics
             )
         }
 
