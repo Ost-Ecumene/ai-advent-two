@@ -4,6 +4,7 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -60,14 +61,15 @@ fun UiTextField(
                 lineHeight = 20.sp
             )
         ) { innerTextField ->
-            if (text.isEmpty() && placeholderText != null) {
-                Text(
-                    text = placeholderText,
-                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
-                    style = MaterialTheme.typography.bodyLarge
-                )
-            } else {
+            Box {
                 innerTextField()
+                if (text.isEmpty() && placeholderText != null) {
+                    Text(
+                        text = placeholderText,
+                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
             }
         }
 
