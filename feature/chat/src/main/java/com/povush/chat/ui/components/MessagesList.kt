@@ -79,6 +79,12 @@ fun MessagesList(
                         )
                     }
                 }
+                is ChatItem.AgentInteraction -> {
+                    AgentInteractionCard(
+                        task = item.task,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
                 is ChatItem.Message -> {
                     val isUser = item.role == Role.User
 

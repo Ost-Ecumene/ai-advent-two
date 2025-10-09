@@ -17,4 +17,9 @@ sealed class ChatItem {
         val text: String,
         val role: Role
     ) : ChatItem()
+    
+    data class AgentInteraction(
+        val task: AgentTask,
+        val status: AgentTaskStatus = AgentTaskStatus.COMPLETED
+    ) : ChatItem()
 }

@@ -16,7 +16,8 @@ import javax.inject.Inject
 
 internal class ChatRepositoryImpl @Inject constructor(
     private val openRouterService: OpenRouterService,
-    private val questGeneratorLLMService: QuestGeneratorLLMService
+    private val questGeneratorLLMService: QuestGeneratorLLMService,
+    private val agentService: com.povush.chat.service.AgentService
 ) : ChatRepository() {
     private val chatSystemPrompt = listOf(ChatMessageDto("system", ""))
     private val basicHistory = listOf(
@@ -36,6 +37,52 @@ internal class ChatRepositoryImpl @Inject constructor(
                 role = Role.User
             )
         }
+        
+        // Проверяем, нужно ли запустить агентский workflow
+        if (message.trim().startsWith("/агенты", ignoreCase = true) || 
+            message.trim().startsWith("/agents", ignoreCase = true)) {
+            // Извлекаем задачу для агентов
+            val task = message.removePrefix("/агенты").removePrefix("/agents").trim()
+            
+            if (task.isEmpty()) {
+                _chatHistory.update {
+                    it + ChatItem.Message(
+                        text = "Пожалуйста, укажите задачу для агентов. Например: /агенты напиши функцию для сортировки массива",
+                        role = Role.Assistant
+                    )
+                }
+                return
+            }
+            
+            // Показываем статус
+            _chatHistory.update {
+                it + ChatItem.Log(
+                    text = "🔄 Запуск агентского workflow...\n${com.povush.chat.model.Agent.Writer.emoji} ${com.povush.chat.model.Agent.Writer.name} начинает работу...",
+                    role = Role.Assistant
+                )
+            }
+            
+            try {
+                // Выполняем задачу через агентов
+                val agentTask = agentService.executeAgentTask(task, temperature, model)
+                
+                // Добавляем результат в историю
+                _chatHistory.update {
+                    it + ChatItem.AgentInteraction(
+                        task = agentTask,
+                        status = com.povush.chat.model.AgentTaskStatus.COMPLETED
+                    )
+                }
+            } catch (e: Exception) {
+                _chatHistory.update {
+                    it + ChatItem.Message(
+                        text = "❌ Ошибка при выполнении агентского workflow: ${e.message}",
+                        role = Role.Assistant
+                    )
+                }
+            }
+            return
+        }
 
         val messages = chatSystemPrompt + chatHistory.value.map { chatItem ->
             when (chatItem) {
@@ -50,6 +97,10 @@ internal class ChatRepositoryImpl @Inject constructor(
                 is ChatItem.Log -> ChatMessageDto(
                     role = chatItem.role.internalName,
                     content = chatItem.text
+                )
+                is ChatItem.AgentInteraction -> ChatMessageDto(
+                    role = Role.Assistant.internalName,
+                    content = "Задача: ${chatItem.task.userTask}\n\nРезультат работы агентов выполнен."
                 )
             }
         }
