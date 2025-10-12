@@ -9,6 +9,7 @@ import com.povush.chat.network.dto.ChatRequestDto
 import com.povush.chat.network.dto.toText
 import com.povush.chat.repository.ChatRepository
 import com.povush.chat.service.QuestGeneratorLLMService
+import com.povush.chat.util.MessageTruncator
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -31,18 +32,31 @@ internal class ChatRepositoryImpl @Inject constructor(
     override val chatHistory = _chatHistory.asStateFlow()
 
     override suspend fun sendRequest(message: String, temperature: Double, model: String) {
+        // Обрабатываем сообщение пользователя - обрезаем если превышает лимит токенов
+        val (processedMessage, wasTruncated) = MessageTruncator.processUserMessage(message)
+        
         _chatHistory.update {
             it + ChatItem.Message(
-                text = message,
+                text = processedMessage,
                 role = Role.User
             )
         }
         
+        // Если сообщение было обрезано, показываем уведомление
+        if (wasTruncated) {
+            _chatHistory.update {
+                it + ChatItem.Log(
+                    text = "⚠️ Ваше сообщение было обрезано из-за превышения лимита в 2000 токенов. Токенов в исходном сообщении: ${MessageTruncator.getTokenCount(message)}",
+                    role = Role.Assistant
+                )
+            }
+        }
+        
         // Проверяем, нужно ли запустить агентский workflow
-        if (message.trim().startsWith("/агенты", ignoreCase = true) || 
-            message.trim().startsWith("/agents", ignoreCase = true)) {
+        if (processedMessage.trim().startsWith("/агенты", ignoreCase = true) || 
+            processedMessage.trim().startsWith("/agents", ignoreCase = true)) {
             // Извлекаем задачу для агентов
-            val task = message.removePrefix("/агенты").removePrefix("/agents").trim()
+            val task = processedMessage.removePrefix("/агенты").removePrefix("/agents").trim()
             
             if (task.isEmpty()) {
                 _chatHistory.update {
