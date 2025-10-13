@@ -4,11 +4,14 @@
     <application
         android:name="com.povush.aiadvent2.AiAdventApp"
         android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.AIAdvent2">
+        android:theme="@style/Theme.AIAdvent2"
+        android:usesCleartextTraffic="true">
         <activity
             android:name="com.povush.aiadvent2.MainActivity"
             android:exported="true"

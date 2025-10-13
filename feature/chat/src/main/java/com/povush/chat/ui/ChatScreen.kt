@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledIconButton
@@ -42,6 +43,7 @@ import com.povush.chat.ChatConfig
 import com.povush.chat.ui.components.MessagesList
 import com.povush.navigation.navigator.Navigator
 import com.povush.navigation.navigator.impl.MockNavigatorImpl
+import com.povush.navigation.route.MCPScreenRoute
 import com.povush.ui.components.UiTextField
 import kotlin.math.roundToInt
 
@@ -78,6 +80,16 @@ internal fun ChatScreen(
                             modifier = Modifier
                                 .padding(top = 4.dp)
                                 .fillMaxWidth(),
+                        )
+                    }
+                },
+                actions = {
+                    FilledIconButton(
+                        onClick = { navigator.open(MCPScreenRoute) }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Settings,
+                            contentDescription = "MCP Tools"
                         )
                     }
                 }

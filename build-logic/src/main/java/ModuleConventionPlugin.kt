@@ -19,6 +19,7 @@ internal class ModuleConventionPlugin : Plugin<Project> {
             apply(plugin = "org.jetbrains.kotlin.plugin.serialization")
             apply(plugin = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
             apply(plugin = "questogenica.compose")
+            apply(plugin = "questogenica.hilt")
 
             extensions.configure<LibraryExtension> {
                 namespace = this@with.toPackageName()

@@ -1,0 +1,27 @@
+{
+  "name": "mcp-bridge-server",
+  "version": "1.0.0",
+  "description": "MCP Bridge Server for Android AI Advent 2",
+  "main": "simple-mcp-server.js",
+  "scripts": {
+    "start": "node simple-mcp-server.js",
+    "start-original": "node mcp-bridge-server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "android",
+    "bridge"
+  ],
+  "author": "AI Advent 2",
+  "license": "MIT"
+}
+
+

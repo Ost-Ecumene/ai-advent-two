@@ -11,6 +11,7 @@ import androidx.navigation3.ui.rememberSceneSetupNavEntryDecorator
 import com.povush.navigation.di.EntryProviderInstaller
 import com.povush.navigation.navigator.impl.NavigatorImpl
 import com.povush.navigation.route.ChatScreenRoute
+import com.povush.navigation.route.MCPScreenRoute
 
 @Composable
 public fun NavigationRoot(
